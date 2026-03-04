@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="mn">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Whack a Mole</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <h1>Whack-a-Mole</h1>
+
+      <div class="info">
+        <div>⏱ Time: <span id="time">30</span>s</div>
+        <div>⭐ Score: <span id="score">0</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="hole"><div class="mole"></div></div>
+        <div class="hole"><div class="mole"></div></div>
+        <div class="hole"><div class="mole"></div></div>
+        <div class="hole"><div class="mole"></div></div>
+        <div class="hole"><div class="mole"></div></div>
+        <div class="hole"><div class="mole"></div></div>
+      </div>
+
+      <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <script>
+      const holes = document.querySelectorAll(".hole");
+      const moles = document.querySelectorAll(".mole");
+      const scoreBoard = document.getElementById("score");
+      const timeBoard = document.getElementById("time");
+
+      let lastHole;
+      let timeUp = false;
+      let score = 0;
+      let time = 30;
+      let timer;
+
+      function randomHole(holes) {
+        const idx = Math.floor(Math.random() * holes.length);
+        const hole = holes[idx];
+        if (hole === lastHole) {
+          return randomHole(holes);
+        }
+        lastHole = hole;
+        return hole;
+      }
+
+      function peep() {
+        const hole = randomHole(holes);
+        hole.classList.add("up");
+        const peepTime = Math.random() * 800 + 400;
+
+        setTimeout(() => {
+          hole.classList.remove("up");
+          if (!timeUp) peep();
+        }, peepTime);
+      }
+
+      function startGame() {
+        score = 0;
+        time = 30;
+        scoreBoard.textContent = score;
+        timeBoard.textContent = time;
+        timeUp = false;
+
+        peep();
+        timer = setInterval(() => {
+          time--;
+          timeBoard.textContent = time;
+          if (time <= 0) {
+            clearInterval(timer);
+            timeUp = true;
+            alert("Тоглоом дууслаа! Таны оноо: " + score);
+          }
+        }, 1000);
+      }
+
+      function whack(e) {
+        if (!this.parentNode.classList.contains("up")) return;
+        score++;
+        scoreBoard.textContent = score;
+        this.parentNode.classList.remove("up");
+      }
+
+      moles.forEach((mole) => mole.addEventListener("click", whack));
+    </script>
+  </body>
+</html>
